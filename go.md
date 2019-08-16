@@ -303,7 +303,6 @@ func main() {
 
 	// deleting something from a map
 	// delete(map, "key")
-
 	delete(x, "James")
 	fmt.Println(x)
 
@@ -316,14 +315,268 @@ func main() {
 ```
 
 ```go
+package main
+
+import "fmt"
+
+func main() {
+	x := []int{1, 2, 3, 4, 5, 6, 7}
+
+	for i, v := range x {
+		fmt.Printf("index: %v\t value: %v\n", i, v)
+	}
+
+	for i := 0; i < len(x); i++ {
+		fmt.Println(x[i])
+	}
+	fmt.Printf("type: %T\nvalue: %v\n", x, x)
+
+	var y [11]int
+	for i := 0; i <= 10; i++ {
+		y[i] = i
+		fmt.Println(y)
+	}
+
+	// slicing slices
+	slice1 := append(x[:1], y[:1]...)
+	fmt.Println(slice1)
+
+	// appending slices
+	slice2 := []int{42, 43, 45, 46, 47, 48, 49}
+	slice2 = append(slice2, 50)
+	fmt.Println(slice2)
+	slice2 = append(slice2, 51, 52, 53)
+	fmt.Println(slice2)
+	slice3 := []int{54, 55, 56, 57}
+	slice2 = append(slice2, slice3...)
+
+	// deleting from a slice
+	slice4 := []int{42, 43, 44, 45, 46, 47, 48, 49, 50, 51}
+	slice5 := append(slice4[:3], slice4[8:]...)
+	fmt.Println(slice5)
+
+	// big slice
+	states := []string{` Alabama`, ` Alaska`, ` Arizona`, ` Arkansas`, ` California`, ` Colorado`, ` Connecticut`, ` Delaware`, ` Florida`, ` Georgia`, ` Hawaii`, ` Idaho`, ` Illinois`, ` Indiana`, ` Iowa`, ` Kansas`, ` Kentucky`, ` Louisiana`, ` Maine`, ` Maryland`, ` Massachusetts`, ` Michigan`, ` Minnesota`, ` Mississippi`, ` Missouri`, ` Montana`, ` Nebraska`, ` Nevada`, ` New Hampshire`, ` New Jersey`, ` New Mexico`, ` New York`, ` North Carolina`, ` North Dakota`, ` Ohio`, ` Oklahoma`, ` Oregon`, ` Pennsylvania`, ` Rhode Island`, ` South Carolina`, ` South Dakota`, ` Tennessee`, ` Texas`, ` Utah`, ` Vermont`, ` Virginia`, ` Washington`, ` West Virginia`, ` Wisconsin`, ` Wyoming`}
+
+	fmt.Println(states)
+	fmt.Printf("the length of the slice is %v\nthe capcity of the slice is %v\n", len(states), cap(states))
+
+	for j := 0; j <= 49; j++ {
+		fmt.Printf("index: %v\tstate: %v\n", j, states[j])
+	}
+
+	// slice of a slice string
+	slice6 := []string{"James", "Bond", "Shaken, not stirred"}
+	slice7 := []string{"Miss", "Moneypenny", "Helloooooo, James."}
+
+	slice8 := [][]string{slice6, slice7}
+	fmt.Printf("slice of a slice of type string %v\n", slice8)
+
+	// maps
+	map1 := map[string][]string{
+		"bond_james":      []string{"Shaken, not stirred", "Martinis", "Women"},
+		"moneypenny_miss": []string{"James Bond", "Literature", "Computer Science"},
+		"no_dr":           []string{"Being evil", "Ice cream", "Sunsets"},
+	}
+
+	for k, v := range map1 {
+		fmt.Println("this is the record for", k)
+		for i, v2 := range v {
+			fmt.Println("\t", i, v2)
+		}
+	}
+
+}
+
+
+```
+
+# Structs
+
+```go
+package main
+
+import "fmt"
+
+// the type is person and the underlying type is struct
+type person struct {
+	first string
+	last  string
+	age   int
+}
+
+// a secretAent is everything a person is and more..
+type secretAgent struct {
+	person
+	ltk bool
+}
+
+func main() {
+	// p1 is a variable that stores a value of type person
+	// known as a composite/aggregate/complex data structure as it contain different types
+	p1 := person{
+		first: "James",
+		last:  "Bond",
+		age:   32,
+	}
+
+	p2 := person{
+		first: "Miss",
+		last:  "Moneypenny",
+		age:   24,
+	}
+	fmt.Printf("p1: %v\tp2: %v\n", p1, p2)
+	// we can access values with dot notation like javascript!
+	fmt.Println(p1.first, p2.first)
+
+	sa1 := secretAgent{
+		person: person{
+			first: "James",
+			last:  "Bond",
+			age:   32},
+		ltk: true,
+	}
+	fmt.Println(sa1.first, sa1.last, sa1.age, sa1.ltk)
+	fmt.Println(sa1.person.first, sa1.person.last, sa1.age, sa1.ltk)
+	// both work! you dont need to specify that the key first is part of the embedded type person but will need to if there is a naming collision
+
+	// if you only have to use a struct in one little area the below method of creating an anonmymous struct is preffered for cleaner code
+	p3 := struct {
+		first string
+		last  string
+		age   int
+	}{
+		first: "James",
+		last:  "Bond",
+		age:   32,
+	}
+
+	fmt.Println(p3)
+}
+
 
 ```
 
 ```go
+package main
 
-```
+import (
+	"fmt"
+)
 
-```go
+type person struct {
+	first      string
+	last       string
+	favFlavors []string
+}
+
+type vehicle struct {
+	doors  int
+	colors []string
+}
+
+type truck struct {
+	vehicle
+	fourWheel bool
+}
+
+type sedan struct {
+	vehicle
+	luxury bool
+}
+
+func main() {
+	p1 := person{
+		first: "James",
+		last:  "Bond",
+		favFlavors: []string{
+			"chocolate",
+			"martini",
+			"rum and coke",
+		},
+	}
+
+	p2 := person{
+		first: "Miss",
+		last:  "Moneypenny",
+		favFlavors: []string{
+			"strawberry",
+			"vanilla",
+			"capuccino",
+		},
+	}
+
+	m := map[string]person{
+		p1.last: p1,
+		p2.last: p2,
+	}
+
+	for _, v := range m {
+		fmt.Println(v.first)
+		fmt.Println(v.last)
+		for i, val := range v.favFlavors {
+			fmt.Println(i, val)
+		}
+		fmt.Println("-------")
+	}
+
+	// Complex structs
+	vehicle1 := truck{
+		vehicle: vehicle{
+			doors:  6,
+			colors: []string{"black", "grey", "silver"},
+		},
+		fourWheel: true,
+	}
+
+	vehicle2 := sedan{
+		vehicle: vehicle{
+			doors:  4,
+			colors: []string{"white", "red", "blue"},
+		},
+		luxury: false,
+	}
+
+	vehicle3 := sedan{
+		vehicle: vehicle{
+			doors:  4,
+			colors: []string{"silver", "black"},
+		},
+		luxury: true,
+	}
+
+	// anonoymous Structs
+	fmt.Println(vehicle1, vehicle2, vehicle3)
+
+	s := struct {
+		first     string
+		friends   map[string]int
+		favDrinks []string
+	}{
+		first: "James",
+		friends: map[string]int{
+			"Moneypenny": 555,
+			"Q":          777,
+			"M":          888,
+		},
+		favDrinks: []string{
+			"Martini",
+			"Water",
+		},
+	}
+	fmt.Println(s.first)
+	fmt.Println(s.friends)
+	fmt.Println(s.favDrinks)
+
+	for k, v := range s.friends {
+		fmt.Println(k, v)
+	}
+
+	for i, val := range s.favDrinks {
+		fmt.Println(i, val)
+	}
+}
+
 
 ```
 
