@@ -661,7 +661,22 @@ func sum(s string, x ...int) int {
 }
 ```
 
+## Defer keyword
+
 ```go
+func main() {
+	defer foo()
+	bar()
+}
+// right when func main exists the defered functions then run
+// this is used for opening and closing files...
+
+func foo() {
+	fmt.Println("foo")
+}
+func bar() {
+	fmt.Println("bar")
+}
 
 ```
 
