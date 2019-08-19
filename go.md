@@ -577,15 +577,88 @@ func main() {
 	}
 }
 
-
 ```
 
-```go
+# Functions
 
+```go
+package main
+
+import "fmt"
+
+func main() {
+	foo()
+	bar("Brad")
+	x := woo("Brad")
+	y, j := tang("Brad", "Richardson")
+	fmt.Println(x)
+	fmt.Println(y, j)
+	sum := sum(4, 4, 6, 8)
+	fmt.Println("the sum is", sum)
+}
+
+func foo() {
+	fmt.Println("hello from foo")
+}
+
+func bar(s string) {
+	fmt.Println("Hello from bar, ", s)
+}
+
+func woo(s string) string {
+	return fmt.Sprint("Hello from woo, ", s)
+}
+
+func tang(x string, y string) (string, bool) {
+	a := fmt.Sprint(x, " ", y, " ", "says Hello")
+	b := true
+	return a, b
+}
+
+// an example of a function with variadic parameters
+func sum(x ...int) int {
+	fmt.Println(x)
+	fmt.Printf("%T\n", x)
+
+	sum := 0 // var sum int
+	for i, v := range x {
+		sum += v
+		fmt.Println("for item in position,", i, "we are now adding,", v, "to the total", sum)
+	}
+	return sum
+
+}
 ```
 
-```go
+## Unfurling a Slice and multiple parameters with one variadic
 
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	xi := []int{12,12,12}
+	x := sum("james", xi...)
+	fmt.Println("The total is", x)
+}
+
+func sum(s string, x ...int) int {
+	fmt.Println(x)
+	fmt.Printf("%T\n", x)
+	fmt.Println(len(x))
+	fmt.Println(cap(x))
+
+	sum := 0
+	for i, v := range x {
+		sum += v
+		fmt.Println("for item in index position", i, "we are now adding", v, "to the total which is now", sum)
+	}
+	fmt.Println("The total is", sum)
+	return sum
+}
 ```
 
 ```go
