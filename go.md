@@ -724,6 +724,8 @@ func main() {
 
 # Interfaces and Polymorhism
 
+[https://www.ardanlabs.com/blog/2015/09/composition-with-go.html]
+
 ```go
 // a value can be of more than one type
 package main
@@ -815,8 +817,18 @@ func main() {
 
 ```
 
-```go
+# Anonymous Functions
 
+```go
+func main() {
+	func() {
+		fmt.Println("anonymous func")
+	}()
+
+	func(x int) {
+		fmt.Println("my age:", x)
+	}(23)
+}
 ```
 
 ```go
