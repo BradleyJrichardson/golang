@@ -880,6 +880,35 @@ func bar() func() int {
 # Callback
 
 ```go
+package main
+
+import "fmt"
+
+func main() {
+
+	ii := []int{7, 5, 9, 1, 1, 3}
+	s := sum(ii...)
+	fmt.Println(s)
+}
+
+func sum(xi ...int) int {
+	total := 0
+	for _, v := range xi {
+		total += v
+	}
+	return total
+}
+
+func evenSum(f func(x ...int) int, y ...int) int {
+	var xi []int
+	for _, v := range y {
+		if v%2 == 0 {
+			xi = append(xi, v)
+		}
+	}
+	total := f(xi...)
+	return total
+}
 
 ```
 
