@@ -61,7 +61,7 @@ func main() {
 allows for reduction of scope of variables, as the assignment is inside of the if statement it's contained!
 
 ```go
-func main() {
+func main() {o
 
 	if x := 42; x == 42 {
 		fmt.Println("001")
@@ -930,7 +930,45 @@ func odd(f func(xi ...int) int, vi ...int) int {
 
 ```
 
+,
+
+# Closure
+
 ```go
+package main
+
+import "fmt"
+
+var x int
+
+func main() {
+	fmt.Println(x)
+	x++
+	fmt.Println(x)
+	foo()
+	fmt.Println(x)
+
+	{
+		y := 35
+		fmt.Println(y)
+	}
+
+	a := incrementor()
+	fmt.Println(a())
+}
+
+func foo() {
+	fmt.Println("hello")
+	x++
+}
+
+func incrementor() func() int {
+	var xi int
+	return func() int {
+		xi++
+		return xi
+	}
+}
 
 ```
 
