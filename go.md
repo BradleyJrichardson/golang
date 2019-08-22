@@ -831,13 +831,53 @@ func main() {
 }
 ```
 
+# Function Expressions
+
 ```go
+func main() {
+	// in go functions are first class citizens and it can be treated as all other types can be ...
+
+	// a func expression is simple assigning a function to a variable.. like is JS we do const foo = () => console.log("my func expression")
+
+	f := func(x int) {
+		fmt.Println("my func expression", x)
+	}
+
+	f(42)
+}
+```
+
+# Returning a function
+
+```go
+func main() {
+
+	s1 := foo()
+	fmt.Println(s1)
+
+	fmt.Println(bar()())
+	x := bar()
+	fmt.Printf("%T\n", x)
+	fmt.Println(x())
+	i := x()
+	fmt.Println(i)
+}
+
+// returning a string
+func foo() string {
+	return "hello world"
+
+}
+
+func bar() func() int {
+	return func() int {
+		return 451
+	}
+}
 
 ```
 
-```go
-
-```
+# Callback
 
 ```go
 
