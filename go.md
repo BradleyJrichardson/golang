@@ -1119,6 +1119,32 @@ func foo4(x person, y person) {
 # Introduction to Pointers
 
 ```go
+package main
+
+import "fmt"
+
+func main() {
+	a := 42
+	fmt.Println(a)
+	// the & operator shows us the address of the value
+	// and what is the address?
+	fmt.Println(&a)
+
+	fmt.Printf("%T\n", a)
+	fmt.Printf("%T\n", &a) // type is a pointer to an int which is a differnt type! *int != int
+
+	// var b *int = &a
+	b := &a
+	fmt.Println(b)  // b now points to that memory address
+	fmt.Println(*b) // the value at that address!!
+	// the * operator shows us the value at the address de-referencing the address
+	fmt.Println(*&a)
+
+	// changing the value at the address
+	*b = 43
+
+	fmt.Println(a)
+}
 
 ```
 
