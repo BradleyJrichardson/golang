@@ -652,7 +652,7 @@ func sum(s string, x ...int) int {
 	fmt.Println(cap(x))
 
 	sum := 0
-	for i, v := range x {
+	for i, v := range {
 		sum += v
 		fmt.Println("for item in index position", i, "we are now adding", v, "to the total which is now", sum)
 	}
@@ -972,9 +972,151 @@ func incrementor() func() int {
 
 ```
 
+# Playing with functions
+
 ```go
 
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+// Exercise Four
+type person struct {
+	first string
+	last  string
+	age   int
+}
+
+func (s person) describe() {
+	fmt.Println("i am", s.first, s.last, s.age)
+}
+
+// Exerise Five
+type circle struct {
+	radius float64
+}
+type square struct {
+	length float64
+}
+
+func (c circle) area() float64 {
+	return math.Pi * c.radius * c.radius
+}
+func (s square) area() float64 {
+	return s.length * s.length
+}
+
+type shape interface {
+	area() float64
+}
+
+func info(s shape) {
+	fmt.Println(s.area())
+}
+
+func main() {
+	// Exercise One
+	fmt.Println("Exercise 1 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	fmt.Println("foo returns:", foo())
+	x, y := bar()
+	fmt.Println("bar returns:", x, y)
+
+	// Exercise Two
+	fmt.Println("Exercise 2 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	ii := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	n := foo2(ii...)
+	fmt.Println(n)
+
+	ii2 := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	n2 := bar2(ii2)
+	fmt.Println(n2)
+
+	// Exercise Three
+	fmt.Println("Exercise 3 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	defer foo3()
+
+	// Exercise Four
+	fmt.Println("Exercise 4 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	p1 := person{
+		"Brad",
+		"Richardson",
+		23,
+	}
+	p2 := person{
+		"Adam",
+		"Smith",
+		31,
+	}
+	foo4(p1, p2)
+
+	// Exercise Five
+	fmt.Println("Exercise 5 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	circ := circle{
+		radius: 12.345,
+	}
+
+	squa := square{
+		length: 15,
+	}
+	info(circ)
+	info(squa)
+
+	// Exercise Six
+	fmt.Println("Exercise 6 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	x6 := func(x int) int {
+		return x * 10
+	}(10)
+	fmt.Println(x6)
+
+
+	// Exercise Seven
+	fmt.Println("Exercise 7 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
+	func foo7() {
+		return foo8(){
+
+		}
+	}
+
+}
+
+func foo() int {
+	return 57
+}
+func bar() (int, string) {
+	return 75, "string"
+}
+
+func foo2(xi ...int) int {
+	total := 0
+	for _, v := range xi {
+		total += v
+	}
+	return total
+}
+
+func bar2(xi []int) int {
+	total := 0
+	for _, v := range xi {
+		total += v
+	}
+	return total
+}
+
+func foo3() {
+	fmt.Println("This is a defered function")
+}
+
+func foo4(x person, y person) {
+	x.describe()
+	y.describe()
+}
 ```
+
+# Introduction to Pointers
 
 ```go
 
