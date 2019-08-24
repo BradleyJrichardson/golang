@@ -1144,7 +1144,223 @@ func main() {
 	*b = 43
 
 	fmt.Println(a)
+
+	// when to use pointers?
+	// pointers are performant to pass around big chunks of data, just passing an address is better than passing the chunk
+
+	// de-referance an address and change the value that is at that address
+
+	fmt.Println("------------------------------")
+	x := 0
+	fmt.Println("x before", &x)
+	fmt.Println("x before", x)
+	foo(&x)
+	fmt.Println("x after", &x)
+	fmt.Println("x after", x)
 }
+
+func foo(y *int) {
+	fmt.Println("y before", y)
+	fmt.Println("y before", *y)
+	*y = 43
+	fmt.Println("y after", y)
+	fmt.Println("y after", *y)
+}
+
+
+```
+
+```go
+package main
+
+type person struct {
+	name string
+}
+
+func main() {
+	p1 := person{
+		name: "Brad Richardson"
+	}
+
+	fmt.Println(p1)
+	changeMe(&p1)
+	fmt.Println(p1)
+}
+
+
+// p *person = value of type pointer to person
+func changeMe(p *person){
+ p.name = "Steven Heinz"
+}
+```
+
+# My first go Program!
+
+taking data from a struct and marshal/unmarshal it to json/struct
+
+```go
+// https://godoc.org/encoding/json#Marshal
+
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type person struct {
+	First string
+	Last  string
+	Age   int
+}
+
+func main() {
+	p1 := person{
+		First: "James",
+		Last:  "Bond",
+		Age:   32,
+	}
+	p2 := person{
+		First: "Miss",
+		Last:  "Moneypenny",
+		Age:   27,
+	}
+
+	j := encodePersonToJSON(p1, p2)
+	p := decodeJSONtoPerson(j)
+
+	fmt.Println(j)
+	fmt.Println(p)
+}
+
+// func Marshal(v interface{}) ([]byte, error)
+func encodePersonToJSON(p1 person, p2 person) string {
+	people := []person{p1, p2}
+
+	bs, err := json.Marshal(people)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return string(bs) // string(bs) - convert byte slice to a string
+}
+
+// func Unmarshal(data []byte, v interface{}) error
+func decodeJSONtoPerson(j string) []person {
+	var people []person
+	bs := []byte(j)
+	err := json.Unmarshal(bs, &people)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	return people
+}
+
+
+```
+
+# Digging into things
+
+```go
+package main
+
+import (
+	"fmt"
+	"io"
+	"os"
+)
+
+func main() {
+	fmt.Println("Hello, playground")
+	fmt.Fprintln(os.Stdout, "Hello, playground")
+	io.WriteString(os.Stdout, "Hello, playground")
+	os.Stdout.Write([]byte("Hello, playground"))
+}
+
+
+```
+
+# Sort Package
+
+```go
+package main
+
+import (
+	"fmt"
+	"sort"
+)
+
+func main() {
+	xi := []int{4, 7, 3, 42, 99, 18, 16, 56, 12}
+	xs := []string{"James", "Q", "M", "Moneypenny", "Dr. No"}
+
+	fmt.Println(xi)
+	sort.Ints(xi)
+	fmt.Println(xi)
+
+	fmt.Println("------")
+	fmt.Println(xs)
+	sort.Strings(xs)
+	fmt.Println(xs)
+}
+
+```
+
+# Custom Sort
+
+```go
+package main
+
+import (
+	"fmt"
+	"sort"
+)
+
+type Person struct {
+	First string
+	Age   int
+}
+
+type ByAge []Person
+
+func (a ByAge) Len() int           { return len(a) }
+func (a ByAge) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByAge) Less(i, j int) bool { return a[i].Age < a[j].Age }
+
+type ByName []Person
+
+// sort uses these three methods...
+func (bn ByName) Len() int           { return len(bn) }
+func (bn ByName) Swap(i, j int)      { bn[i], bn[j] = bn[j], bn[i] }
+func (bn ByName) Less(i, j int) bool { return bn[i].First < bn[j].First }
+
+func main() {
+	p1 := Person{"James", 32}
+	p2 := Person{"Moneypenny", 27}
+	p3 := Person{"Q", 64}
+	p4 := Person{"M", 56}
+
+	people := []Person{p1, p2, p3, p4}
+
+	fmt.Println(people)
+	sort.Sort(ByAge(people))
+	fmt.Println(people)
+	sort.Sort(ByName(people))
+	fmt.Println(people)
+
+}
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
 
 ```
 
