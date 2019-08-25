@@ -1496,6 +1496,299 @@ func bar() {
 
 ```
 
+# Channels
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func doSomething(x int) int {
+	return x * 5
+}
+
+func main() {
+	ch := make(chan int)
+	go func() {
+		ch <- doSomething(5)
+	}()
+	fmt.Println(<-ch)
+}
+
+
+```
+
+# Race conditions
+
+when different goroutines are reading/changing/writing the shared variable
+this causes unpredicatble results!
+
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+	"sync"
+)
+
+func main() {
+	fmt.Println("CPUs:", runtime.NumCPU())
+	fmt.Println("Goroutines:", runtime.NumGoroutine())
+
+	counter := 0
+
+	const gs = 100
+	var wg sync.WaitGroup
+	wg.Add(gs)
+
+	for i := 0; i < gs; i++ {
+		go func() {
+			v := counter
+			runtime.Gosched()
+			v++
+			counter = v
+			wg.Done()
+		}()
+		fmt.Println("Goroutines:", runtime.NumGoroutine())
+	}
+	wg.Wait()
+	fmt.Println("Goroutines:", runtime.NumGoroutine())
+	fmt.Println("count:", counter)
+}
+```
+
+# Mutex - Preventing race conditions
+
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+	"sync"
+)
+
+func main() {
+	fmt.Println("CPUs:", runtime.NumCPU())
+	fmt.Println("Goroutines:", runtime.NumGoroutine())
+
+	counter := 0
+
+	const gs = 100
+	var wg sync.WaitGroup
+	wg.Add(gs)
+
+	var mu sync.Mutex
+
+	for i := 0; i < gs; i++ {
+		go func() {
+			mu.Lock() // ive taken the variable to use you cant have it
+			v := counter
+			runtime.Gosched()
+			v++
+			counter = v
+			mu.Unlock()
+			wg.Done()
+		}()
+		fmt.Println("Goroutines:", runtime.NumGoroutine())
+	}
+	wg.Wait()
+	fmt.Println("Goroutines:", runtime.NumGoroutine())
+	fmt.Println("count:", counter)
+}
+
+
+```
+
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+	"sync"
+)
+
+func main() {
+	counter := 0
+	fmt.Println("CPUs:", runtime.NumCPU())
+	fmt.Println("Goroutines:", runtime.NumGoroutine())
+
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+
+	wg.Add(5)
+
+	go func() {
+		mu.Lock()
+		counter1 := counter
+		runtime.Gosched()
+		fmt.Println("Function 1 - before\t ", counter)
+		counter1++
+		counter = counter1
+		fmt.Println("Function 1 - after\t ", counter)
+		mu.Unlock()
+		wg.Done()
+	}()
+
+	go func() {
+		mu.Lock()
+		counter2 := counter
+		runtime.Gosched()
+		fmt.Println("Function 2 - before\t ", counter)
+		counter2++
+		counter = counter2
+		fmt.Println("Function 2 - after\t ", counter)
+		mu.Unlock()
+		wg.Done()
+	}()
+
+	go func() {
+		mu.Lock()
+		counter3 := counter
+		runtime.Gosched()
+		fmt.Println("Function 3 - before\t ", counter)
+		counter3++
+		counter = counter3
+		fmt.Println("Function 3 - after\t ", counter)
+		mu.Unlock()
+		wg.Done()
+	}()
+
+	go func() {
+		mu.Lock()
+		counter4 := counter
+		runtime.Gosched()
+		fmt.Println("Function 4 - before\t ", counter)
+		counter4++
+		counter = counter4
+		fmt.Println("Function 4 - after\t ", counter)
+		mu.Unlock()
+		wg.Done()
+	}()
+
+	go func() {
+		mu.Lock()
+		counter5 := counter
+		runtime.Gosched()
+		fmt.Println("Function 5 - before\t ", counter)
+		counter5++
+		counter = counter5
+		fmt.Println("Function 5 - after\t ", counter)
+		mu.Unlock()
+		wg.Done()
+	}()
+	fmt.Println("Goroutines:", runtime.NumGoroutine())
+
+	fmt.Println(counter)
+	wg.Wait()
+}
+
+```
+
+# package Atomic
+
+another way to avoid a race condition
+
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+	"sync"
+	"sync/atomic"
+)
+
+func main() {
+	fmt.Println("CPUs:", runtime.NumCPU())
+	fmt.Println("Goroutines:", runtime.NumGoroutine())
+
+	var counter int64
+
+	const gs = 100
+	var wg sync.WaitGroup
+	wg.Add(gs)
+
+	for i := 0; i < gs; i++ {
+		go func() {
+			atomic.AddInt64(&counter, 1)
+			runtime.Gosched()
+			fmt.Println("Counter\t", atomic.LoadInt64(&counter))
+			wg.Done()
+		}()
+		fmt.Println("Goroutines:", runtime.NumGoroutine())
+	}
+	wg.Wait()
+	fmt.Println("Goroutines:", runtime.NumGoroutine())
+	fmt.Println("count:", counter)
+}
+s
+```
+
+# Currency Exercises
+
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+	"sync"
+)
+
+var wg sync.WaitGroup
+
+func main() {
+	fmt.Println("CPUs:", runtime.NumCPU())
+	fmt.Println("Goroutines:", runtime.NumGoroutine())
+	wg.Add(2)
+	go foo()
+	go bar()
+	fmt.Println("Goroutines after function calls:", runtime.NumGoroutine())
+	wg.Wait()
+}
+
+func foo() {
+	fmt.Println("foo")
+	wg.Done()
+}
+
+func bar() {
+	fmt.Println("bar")
+	wg.Done()
+}
+
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
 ```go
 
 ```
