@@ -1451,9 +1451,7 @@ func main() {
 
 # Concurrency
 
-take advantage of those multiple cores
-
-# Wait Group
+## Wait Group
 
 ```go
 package main
@@ -1495,8 +1493,6 @@ func bar() {
 }
 
 ```
-
-# Channels
 
 ```go
 package main
@@ -1560,7 +1556,7 @@ func main() {
 }
 ```
 
-# Mutex - Preventing race conditions
+## Package Mutex - Preventing race conditions
 
 ```go
 package main
@@ -1689,7 +1685,7 @@ func main() {
 
 ```
 
-# package Atomic
+## package Atomic
 
 another way to avoid a race condition
 
@@ -1729,8 +1725,6 @@ func main() {
 s
 ```
 
-# Currency Exercises
-
 ```go
 package main
 
@@ -1765,15 +1759,124 @@ func bar() {
 
 ```
 
-```go
+## Channels
 
+- channels block
+- they are like runners in a relay race
+- they are synchronized
+- they have to pass/receive the value at the same time
+- just like runners in a relay race have to pass / receive the baton to each other at the same time
+
+- one runner can’t pass the baton at one moment
+  and then, later, have the other runner receive the baton
+  the baton is passed/received by the runners at the same time
+  the value is passed/received synchronously; at the same time
+  channels allow us to pass values between goroutines
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	Channel()
+	BufferChannel(1)
+	BufferChannel(2)
+}
+
+func Channel() {
+	c := make(chan int)
+	go func() {
+		c <- 42
+	}()
+	fmt.Println(<-c)
+}
+
+func BufferChannel(x int) {
+	c := make(chan int, x)
+	c <- 42
+
+	if x >= 2 {
+		c <- 43
+	}
+	fmt.Println(<-c)
+	c <- 43
+	fmt.Println(<-c)
+}
 ```
 
 ```go
+package main
+
+import "fmt"
+
+func main() {
+	c := make(chan int, 2)
+
+	c <- 42
+	c <- 43
+	x1 := <-c
+	x2 := <-c
+	fmt.Println(x1)
+	fmt.Println(x2)
+	fmt.Println("-------")
+
+	fmt.Printf("%T\n", c)
+}
 
 ```
 
+# Directional Channels
+
 ```go
+package main
+
+import "fmt"
+
+func main() {
+	c := make(chan int)
+	cr := make(<-chan int) // receive
+	cs := make(chan<- int) // send
+
+	fmt.Println("c\t%t\n", c)
+	fmt.Println("c\t%t\n", cr)
+	fmt.Println("c\t%t\n", cs)
+}
+```
+
+## using channels
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	c := make(chan int)
+
+	go send(c)
+
+	receive(c)
+
+	fmt.Println("about to exit")
+}
+
+// send channel
+func send(c chan<- int) {
+	for i := 0; i < 100; i++ {
+		c <- i
+	}
+	close(c)
+}
+
+// receive channel
+func receive(c <-chan int) {
+	for v := range c {
+		fmt.Println("the value received from the channel:", v)
+	}
+}
 
 ```
 
