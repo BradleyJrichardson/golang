@@ -1252,10 +1252,75 @@ func decodeJSONtoPerson(j string) []person {
 
 	if err != nil {
 		fmt.Println(err)
-	}
+}
 	return people
 }
 
+
+```
+
+# Another method and example
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+)
+
+type user struct {
+	First   string
+	Last    string
+	Age     int
+	Sayings []string
+}
+
+func main() {
+	u1 := user{
+		First: "James",
+		Last:  "Bond",
+		Age:   32,
+		Sayings: []string{
+			"Shaken, not stirred",
+			"Youth is no guarantee of innovation",
+			"In his majesty's royal service",
+		},
+	}
+
+	u2 := user{
+		First: "Miss",
+		Last:  "Moneypenny",
+		Age:   27,
+		Sayings: []string{
+			"James, it is soo good to see you",
+			"Would you like me to take care of that for you, James?",
+			"I would really prefer to be a secret agent myself.",
+		},
+	}
+
+	u3 := user{
+		First: "M",
+		Last:  "Hmmmm",
+		Age:   54,
+		Sayings: []string{
+			"Oh, James. You didn't.",
+			"Dear God, what has James done now?",
+			"Can someone please tell me where James Bond is?",
+		},
+	}
+
+	users := []user{u1, u2, u3}
+
+	fmt.Println(users)
+
+	err := json.NewEncoder(os.Stdout).Encode(users)
+	if err != nil {
+		fmt.Println("We did something wrong and here's the error:", err)
+	}
+
+}
 
 ```
 
@@ -1352,11 +1417,82 @@ func main() {
 
 ```
 
+# Using bcrypt package
+
 ```go
+package main
+
+import (
+	"fmt"
+	"golang.org/x/crypto/bcrypt"
+)
+
+func main() {
+	s := `password123`
+	bs, err := bcrypt.GenerateFromPassword([]byte(s), bcrypt.MinCost)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(s)
+	fmt.Println(bs)
+
+	loginPword1 := `password1234`
+
+	err = bcrypt.CompareHashAndPassword(bs, []byte(loginPword1))
+	if err != nil {
+		fmt.Println("YOU CAN'T LOGIN")
+		return
+	}
+
+	fmt.Println("You're logged in")
+}
 
 ```
 
+# Concurrency
+
+take advantage of those multiple cores
+
+# Wait Group
+
 ```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+	"sync"
+)
+
+var wg sync.WaitGroup
+
+func main() {
+	fmt.Println("OS\t\t", runtime.GOOS)
+	fmt.Println("ARCH\t\t", runtime.GOARCH)
+	fmt.Println("CPUs\t\t", runtime.NumCPU())
+	fmt.Println("Goroutines\t", runtime.NumGoroutine())
+
+	wg.Add(1)
+	go foo()
+	bar()
+
+	fmt.Println("CPUs\t\t", runtime.NumCPU())
+	fmt.Println("Goroutines\t", runtime.NumGoroutine())
+	wg.Wait()
+}
+
+func foo() {
+	for i := 0; i < 10; i++ {
+		fmt.Println("foo:", i)
+	}
+	wg.Done()
+}
+
+func bar() {
+	for i := 0; i < 10; i++ {
+		fmt.Println("bar:", i)
+	}
+}
 
 ```
 
