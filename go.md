@@ -1930,27 +1930,265 @@ func receive(e, o, q <-chan int) {
 
 ```
 
+# Go Applied to Web
+
+## Templates
+
 ```go
+package main
+
+import "fmt"
+
+func main() {
+	name := "Bradley Richardson"
+
+	tpl := `
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+	<meta charset="UTF-8">
+	<title>Hello World!</title>
+	</head>
+	<body>
+	<h1>` + name + `</h1>
+	</body>
+	</html>
+	`
+	fmt.Println(tpl)
+}
 
 ```
 
 ```go
+package main
+
+import (
+	"fmt"
+	"io"
+	"log"
+	"os"
+	"strings"
+)
+
+func main() {
+	name := "Bradley Richardson"
+	str := fmt.Sprint(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hello World!</title>
+</head>
+<body>
+<h1>` +
+		name +
+		`</h1>
+</body>
+</html>
+	`)
+
+	nf, err := os.Create("index.html")
+	if err != nil {
+		log.Fatal("error creating file", err)
+	}
+	defer nf.Close()
+
+	io.Copy(nf, strings.NewReader(str))
+}
 
 ```
 
 ```go
+package main
+
+import (
+	"fmt"
+	"io"
+	"log"
+	"os"
+	"strings"
+)
+
+func main() {
+	name := os.Args[1]
+	fmt.Println(os.Args[0])
+	fmt.Println(os.Args[1])
+	str := fmt.Sprint(`
+		<!DOCTYPE html>
+		<html lang="en">
+		<head>
+		<meta charset="UTF-8">
+		<title>Hello World!</title>
+		</head>
+		<body>
+		<h1>` +
+		name +
+		`</h1>
+		</body>
+		</html>
+	`)
+
+	nf, err := os.Create("index.html")
+	if err != nil {
+		log.Fatal("error creating file", err)
+	}
+	defer nf.Close()
+
+	io.Copy(nf, strings.NewReader(str))
+}
+```
+
+## Parsing templates
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"text/template"
+)
+
+// from text/template
+// func ParseFiles(filenames ...string) (*Template, error)
+// func (t *Template) Execute(wr io.Writer, data interface{}) error
+
+func main() {
+	tpl, err := template.ParseFiles("templates/tpl.html")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fmt.Printf("%T\n", tpl)
+
+	nf, err := os.Create("index.html")
+	if err != nil {
+		log.Fatalln("error creating file", err)
+	}
+	defer nf.Close()
+
+	err = tpl.Execute(os.Stdout, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	tpl1, err := template.ParseGlob("templates/*")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = tpl1.ExecuteTemplate(os.Stdout, "one.html", nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = tpl1.ExecuteTemplate(os.Stdout, "two.html", nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = tpl1.ExecuteTemplate(os.Stdout, "vespa.html", nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
 
 ```
 
+## Parsing templates++
+
 ```go
+package main
+
+import (
+	"log"
+	"os"
+	"text/template"
+)
+
+var tpl *template.Template      //container for all the templates
+
+func init() {
+	tpl = template.Must(template.ParseGlob("templates/*"))
+}
+
+func main() {
+	err := tpl.Execute(os.Stdout, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = tpl.ExecuteTemplate(os.Stdout, "vespa.gohtml", nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = tpl.ExecuteTemplate(os.Stdout, "two.gohtml", nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = tpl.ExecuteTemplate(os.Stdout, "one.gohtml", nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
 
 ```
 
-```go
-
-```
+# Stuctures with templates
 
 ```go
+package main
+
+import (
+	"log"
+	"os"
+	"text/template"
+)
+
+var tpl *template.Template
+
+func init() {
+	tpl = template.Must(template.ParseGlob("templates/*"))
+}
+
+func main() {
+
+	err := tpl.Execute(os.Stdout, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	sages := []string{"Gandhi", "MLK", "Buddha", "Jesus", "Muhammad"}
+
+	sagesMap := map[string]string{
+		"India":    "Gandhi",
+		"America":  "MLK",
+		"Meditate": "Buddha",
+		"Love":     "Jesus",
+		"Prophet":  "Muhammad",
+	}
+
+	err = tpl.ExecuteTemplate(os.Stdout, "00-variable.gohtml", sages)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = tpl.ExecuteTemplate(os.Stdout, "01-range-slice.gohtml", sages)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = tpl.ExecuteTemplate(os.Stdout, "00-variable.gohtml", sagesMap)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = tpl.ExecuteTemplate(os.Stdout, "02-range-map.gohtml", sagesMap)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+}
+
 
 ```
 
