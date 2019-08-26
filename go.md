@@ -2137,6 +2137,40 @@ func main() {
 
 ```
 
+# Template variables
+
+## [template variables](https://godoc.org/text/template#hdr-Variables)
+
+### ASSIGN
+
+```Go
+{{$wisdom := .}}
+```
+
+### USE
+
+```Go
+{{$wisdom}}
+```
+
+A pipeline inside an action may initialize a variable to capture the result. The initialization has syntax
+
+\$variable := pipeline
+
+where \$variable is the name of the variable. An action that declares a variable produces no output.
+
+If a "range" action initializes a variable, the variable is set to the successive elements of the iteration. Also, a "range" may declare two variables, separated by a comma:
+
+range $index, $element := pipeline
+
+in which case $index and $element are set to the successive values of the array/slice index or map key and element, respectively. Note that if there is only one variable, it is assigned the element; this is opposite to the convention in Go range clauses.
+
+A variable's scope extends to the "end" action of the control structure ("if", "with", or "range") in which it is declared, or to the end of the template if there is no such control structure. A template invocation does not inherit variables from the point of its invocation.
+
+When execution begins, \$ is set to the data argument passed to Execute, that is, to the starting value of dot.
+
+<hr>
+
 # Stuctures with templates
 
 ```go
@@ -2189,6 +2223,302 @@ func main() {
 
 }
 
+
+```
+
+# Nested structures with templates
+
+```go
+package main
+
+import (
+	"log"
+	"os"
+	"text/template"
+)
+
+var tpl *template.Template
+
+type sage struct {
+	Name  string
+	Motto string
+}
+
+type car struct {
+	Manufacturer string
+	Model        string
+	Doors        int
+}
+
+func init() {
+	tpl = template.Must(template.ParseFiles("tpl.gohtml"))
+}
+
+func main() {
+
+	b := sage{
+		Name:  "Buddha",
+		Motto: "The belief of no beliefs",
+	}
+
+	g := sage{
+		Name:  "Gandhi",
+		Motto: "Be the change",
+	}
+
+	m := sage{
+		Name:  "Martin Luther King",
+		Motto: "Hatred never ceases with hatred but with love alone is healed.",
+	}
+
+	f := car{
+		Manufacturer: "Ford",
+		Model:        "F150",
+		Doors:        2,
+	}
+
+	c := car{
+		Manufacturer: "Toyota",
+		Model:        "Corolla",
+		Doors:        4,
+	}
+
+	sages := []sage{b, g, m}
+	cars := []car{f, c}
+
+	data := struct {
+		Wisdom    []sage
+		Transport []car
+	}{
+		sages,
+		cars,
+	}
+
+	err := tpl.Execute(os.Stdout, data)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
+
+```
+
+# Using functions in templates
+
+## [template function documentation](https://godoc.org/text/template#hdr-Functions)
+
+---
+
+## [template.FuncMap](type FuncMap map[string]interface{})
+
+FuncMap is the type of the map defining the mapping from names to functions. Each function must have either a single return value, or two return values of which the second has type error. In that case, if the second (error) return value evaluates to non-nil during execution, execution terminates and Execute returns that error.
+
+## [template.Funcs](https://godoc.org/text/template#Template.Funcs)
+
+```Go
+func (t *Template) Funcs(funcMap FuncMap) *Template
+```
+
+---
+
+During execution functions are found in two function maps:
+
+- first in the template,
+- then in the global function map.
+
+By default, no functions are defined in the template but the Funcs method can be used to add them.
+
+Predefined global functions are defined in text/template.
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
+
+```
+
+```go
 
 ```
 
