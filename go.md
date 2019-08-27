@@ -2331,14 +2331,174 @@ By default, no functions are defined in the template but the Funcs method can be
 Predefined global functions are defined in text/template.
 
 ```go
+package main
+
+import (
+	"log"
+	"os"
+	"strings"
+	"text/template"
+)
+
+var tpl *template.Template
+
+type sage struct {
+	Name  string
+	Motto string
+}
+
+type car struct {
+	Manufacturer string
+	Model        string
+	Doors        int
+}
+
+// FuncMap to register functions.
+var fm = template.FuncMap{
+	"uc": strings.ToUpper,
+	"ft": firstThree,
+}
+
+func init() {
+	tpl = template.Must(template.New("").Funcs(fm).ParseFiles("templates/04-func-map.gohtml"))
+}
+
+func firstThree(s string) string {
+	s = strings.TrimSpace(s)
+	if len(s) >= 3 {
+		s = s[:3]
+	}
+	return s
+}
+
+func main() {
+
+	b := sage{
+		Name:  "Buddha",
+		Motto: "The belief of no beliefs",
+	}
+
+	g := sage{
+		Name:  "Gandhi",
+		Motto: "Be the change",
+	}
+
+	m := sage{
+		Name:  "Martin Luther King",
+		Motto: "Hatred never ceases with hatred but with love alone is healed.",
+	}
+
+	f := car{
+		Manufacturer: "Ford",
+		Model:        "F150",
+		Doors:        2,
+	}
+
+	c := car{
+		Manufacturer: "Toyota",
+		Model:        "Corolla",
+		Doors:        4,
+	}
+
+	sages := []sage{b, g, m}
+	cars := []car{f, c}
+
+	data := struct {
+		Wisdom    []sage
+		Transport []car
+	}{
+		sages,
+		cars,
+	}
+
+	err := tpl.ExecuteTemplate(os.Stdout, "04-func-map.gohtml", data)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
 
 ```
 
+# Pipeline
+
 ```go
+package main
+
+import (
+	"log"
+	"math"
+	"os"
+	"text/template"
+)
+
+var tpl *template.Template
+
+func init() {
+	tpl = template.Must(template.New("").Funcs(fm).ParseFiles("templates/05-pipeline.gohtml"))
+}
+
+func double(x int) int {
+	return x + x
+}
+
+func square(x int) float64 {
+	return math.Pow(float64(x), 2)
+}
+
+func sqRoot(x float64) float64 {
+	return math.Sqrt(x)
+}
+
+var fm = template.FuncMap{
+	"fdbl":  double,
+	"fsq":   square,
+	"fsqrt": sqRoot,
+}
+
+func main() {
+
+	err := tpl.ExecuteTemplate(os.Stdout, "05-pipeline.gohtml", 3)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
 
 ```
 
+# Using dates in a pipeline
+
 ```go
+package main
+
+import (
+	"log"
+	"os"
+	"text/template"
+	"time"
+)
+
+var tpl *template.Template
+
+func init() {
+	tpl = template.Must(template.New("").Funcs(fm).ParseFiles("templates/06-date-pipeline.gohtml"))
+}
+
+func monthDayYear(t time.Time) string {
+	return t.Format("01-02-2006")
+}
+
+var fm = template.FuncMap{
+	"fdateMDY": monthDayYear,
+}
+
+func main() {
+
+	err := tpl.ExecuteTemplate(os.Stdout, "06-date-pipeline.gohtml", time.Now())
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
 
 ```
 
