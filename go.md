@@ -2502,7 +2502,88 @@ func main() {
 
 ```
 
+# Inbuilt Template Functions
+
 ```go
+package main
+
+import (
+	"log"
+	"os"
+	"text/template"
+)
+
+var tpl *template.Template
+
+func init() {
+	tpl = template.Must(template.ParseFiles("./templates/07-index.gohtml", "./templates/08-struct.gohtml", "./templates/09-and.gohtml", "./templates/10-comparision.gohtml"))
+}
+
+type user struct {
+	Name  string
+	Motto string
+	Admin bool
+}
+
+func main() {
+
+	u1 := user{
+		Name:  "Buddha",
+		Motto: "The belief of no beliefs",
+		Admin: false,
+	}
+
+	u2 := user{
+		Name:  "Gandhi",
+		Motto: "Be the change",
+		Admin: true,
+	}
+
+	u3 := user{
+		Name:  "",
+		Motto: "Nobody",
+		Admin: true,
+	}
+
+	users := []user{u1, u2, u3}
+
+	xs := []string{"zero", "one", "two", "three", "four", "five"}
+
+	data := struct {
+		Words []string
+		Lname string
+	}{
+		xs,
+		"McLeod",
+	}
+
+	g1 := struct {
+		Score1 int
+		Score2 int
+	}{
+		7,
+		9,
+	}
+
+	err := tpl.ExecuteTemplate(os.Stdout, "07-index.gohtml", xs)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = tpl.ExecuteTemplate(os.Stdout, "08-struct.gohtml", data)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = tpl.ExecuteTemplate(os.Stdout, "09-and.gohtml", users)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = tpl.ExecuteTemplate(os.Stdout, "10-comparision.gohtml", g1)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
 
 ```
 
