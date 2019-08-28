@@ -2650,15 +2650,312 @@ func main() {
 
 ```
 
+# TCP server essentials
+
+## Listen
+
+[net.Listen](https://godoc.org/net#Listen)
+
+```Go
+func Listen(net, laddr string) (Listener, error)
+```
+
+## Listener
+
+[net.Listener](https://godoc.org/net#Listener)
+
+```Go
+type Listener interface {
+    // Accept waits for and returns the next connection to the listener.
+    Accept() (Conn, error)
+
+    // Close closes the listener.
+    // Any blocked Accept operations will be unblocked and return errors.
+    Close() error
+
+    // Addr returns the listener's network address.
+    Addr() Addr
+}
+```
+
+## Connection
+
+[net.Conn](https://godoc.org/net#Conn)
+
+```Go
+type Conn interface {
+    // Read reads data from the connection.
+    Read(b []byte) (n int, err error)
+
+    // Write writes data to the connection.
+    Write(b []byte) (n int, err error)
+
+    // Close closes the connection.
+    // Any blocked Read or Write operations will be unblocked and return errors.
+    Close() error
+
+    // LocalAddr returns the local network address.
+    LocalAddr() Addr
+
+    // RemoteAddr returns the remote network address.
+    RemoteAddr() Addr
+
+    SetDeadline(t time.Time) error
+
+    SetReadDeadline(t time.Time) error
+
+    SetWriteDeadline(t time.Time) error
+}
+```
+
+## Dial
+
+[net.Dial](https://godoc.org/net#Dial)
+
+```Go
+func Dial(network, address string) (Conn, error)
+```
+
+---
+
+# Write
+
+[io.WriteString](https://godoc.org/io#WriteString)
+
+```Go
+func WriteString(w Writer, s string) (n int, err error)
+```
+
+[fmt.Fprintln](https://godoc.org/fmt#Fprintln)
+
+```Go
+func Fprintln(w io.Writer, a ...interface{}) (n int, err error)
+```
+
+---
+
+# Read
+
+- [ioutil.ReadAll](https://godoc.org/io/ioutil#ReadAll)
+
+```Go
+func ReadAll(r io.Reader) ([]byte, error)
+```
+
+- [bufio.NewScanner](https://godoc.org/bufio#NewScanner)
+
+```Go
+func NewScanner(r io.Reader) *Scanner
+```
+
+- [bufio.Scan](https://godoc.org/bufio#Scanner.Scan)
+
+```Go
+func (s *Scanner) Scan() bool
+```
+
+- [bufio.Text](https://godoc.org/bufio#Scanner.Text)
+
+```Go
+func (s *Scanner) Text() string
+```
+
+---
+
+# Read & Write
+
+- [io.Copy](https://godoc.org/io#Copy)
+
+```GO
+func Copy(dst Writer, src Reader) (written int64, err error)
+```
+
+# Server 1
+
 ```go
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"net"
+	"time"
+)
+
+func main() {
+	li, err := net.Listen("tcp", ":8080")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer li.Close()
+
+	for {
+		conn, err := li.Accept()
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		go handle(conn)
+	}
+}
+
+func handle(conn net.Conn) {
+	err := conn.SetDeadline(time.Now().Add(10 * time.Second))
+	if err != nil {
+		log.Fatalln("CONN TIMEOUT")
+	}
+
+	scanner := bufio.NewScanner(conn)
+	for scanner.Scan() {
+		ln := scanner.Text()
+		fmt.Println(ln)
+		fmt.Fprintf(conn, "I heard you say: %s\n", ln)
+	}
+	defer conn.Close()
+
+	fmt.Println("***CODE GOT HERE***")
+}
+
 
 ```
 
+go run main.go
+telnet localhost 8080
+
+# Server 2
+
 ```go
+
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"net"
+	"strings"
+)
+
+func main() {
+	li, err := net.Listen("tcp", ":8080")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer li.Close()
+
+	for {
+		conn, err := li.Accept()
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		go handle(conn)
+	}
+}
+
+func handle(conn net.Conn) {
+	scanner := bufio.NewScanner(conn)
+	for scanner.Scan() {
+		ln := strings.ToLower(scanner.Text())
+		bs := []byte(ln)
+		r := rot13(bs)
+
+		fmt.Fprintf(conn, "%s - %s\n\n", ln, r)
+	}
+}
+
+func rot13(bs []byte) []byte {
+	var r13 = make([]byte, len(bs))
+	for i, v := range bs {
+		// ascii 97 - 122
+		if v <= 109 {
+			r13[i] = v + 13
+		} else {
+			r13[i] = v - 13
+		}
+	}
+	return r13
+}
 
 ```
 
+# Server 3
+
 ```go
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"io"
+	"log"
+	"net"
+	"strings"
+)
+
+func main() {
+	li, err := net.Listen("tcp", ":8080")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer li.Close()
+
+	for {
+		conn, err := li.Accept()
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		go handle(conn)
+	}
+}
+
+func handle(conn net.Conn) {
+	defer conn.Close()
+
+	// instructions
+	io.WriteString(conn, "\r\nIN-MEMORY DATABASE\r\n\r\n"+
+		"USE:\r\n"+
+		"\tSET key value \r\n"+
+		"\tGET key \r\n"+
+		"\tDEL key \r\n\r\n"+
+		"EXAMPLE:\r\n"+
+		"\tSET fav chocolate \r\n"+
+		"\tGET fav \r\n\r\n\r\n")
+
+	// read & write
+	data := make(map[string]string)
+	scanner := bufio.NewScanner(conn)
+	for scanner.Scan() {
+		ln := scanner.Text()
+		fs := strings.Fields(ln)
+		// logic
+		if len(fs) < 1 {
+			continue
+		}
+		switch fs[0] {
+		case "GET":
+			k := fs[1]
+			v := data[k]
+			fmt.Fprintf(conn, "%s\r\n", v)
+		case "SET":
+			if len(fs) != 3 {
+				fmt.Fprintln(conn, "EXPECTED VALUE\r\n")
+				continue
+			}
+			k := fs[1]
+			v := fs[2]
+			data[k] = v
+		case "DEL":
+			k := fs[1]
+			delete(data, k)
+		default:
+			fmt.Fprintln(conn, "INVALID COMMAND "+fs[0]+"\r\n")
+			continue
+		}
+	}
+}
 
 ```
 
