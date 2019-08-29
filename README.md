@@ -286,7 +286,7 @@ func main() {
 	}
 
 	// adding new item to map
-	x["Todd"] = 33
+	x["Brad"] = 33
 	fmt.Println("our map is now\n\n", x)
 
 	// for range of map syntax
@@ -2554,7 +2554,7 @@ func main() {
 		Lname string
 	}{
 		xs,
-		"McLeod",
+		"Brad",
 	}
 
 	g1 := struct {
