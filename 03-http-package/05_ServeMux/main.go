@@ -22,8 +22,9 @@ func main() {
 	// when nil is passed in the default serveMux is used, by using the http.HandleFunc functions in line 24/25 we have attached the two functions d c to the default serveMux
 
 	// two ways to achieve the same thing
-	http.Handle("/dog", http.HandlerFunc(d))
-	http.Handle("/cat", http.HandlerFunc(c))
+	// HandlerFunc is a handler and http.Handle needs this type
+	// http.Handle("/dog", http.HandlerFunc(d))
+	// http.Handle("/cat", http.HandlerFunc(c))
 
-	http.ListenAndServe(":8080", nil)
+	// http.ListenAndServe(":8080", nil)
 }
