@@ -661,6 +661,26 @@ func sum(s string, x ...int) int {
 }
 ```
 
+## Returning multiple values from a function
+
+in go you can return multiple values from a function
+
+```go
+func nextInt(b []byte, i int) (int, int) {
+    for ; i < len(b) && !isDigit(b[i]); i++ {
+    }
+    x := 0
+    for ; i < len(b) && isDigit(b[i]); i++ {
+        x = x*10 + int(b[i]) - '0'
+    }
+    return x, i
+}
+```
+
+```go
+func (file *File) Write(b []byte) (n int, err error)
+```
+
 ## Defer keyword
 
 ```go
