@@ -22,14 +22,13 @@ https://golang.org/doc/go1.6 says:
 
 "The runtime has added lightweight, best-effort detection of concurrent misuse of maps. As always, if one goroutine is writing to a map, no other goroutine should be reading or writing the map concurrently. If the runtime detects this condition, it prints a diagnosis and crashes the program. The best way to find out more about the problem is to run the program under the race detector, which will more reliably identify the race and give more detail."
 
-When you 
+When you
 
 ```
 go build -race
-```  
+```
 
 you do not get a race condition reported.
-
 
 ![no race condition](norace.png)
 
@@ -49,10 +48,9 @@ Check this out:
 
 ![maps are funky](maps.png)
 
-
 https://play.golang.org/p/62DF4xvPeQ
 
-**So you can delete something that doesn't exist, and that is not a problem.** 
+**So you can delete something that doesn't exist, and that is not a problem.**
 
 **And you can ask for something that isn't there, and that is not a problem (gives you the zero value for the map's value).**
 

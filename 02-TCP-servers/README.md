@@ -9,16 +9,18 @@ To configure our code to handle request/response in an HTTP fashion which works 
 # TCP server essentials
 
 ## Listen
- 
- [net.Listen](https://godoc.org/net#Listen)
-``` Go
+
+[net.Listen](https://godoc.org/net#Listen)
+
+```Go
 func Listen(net, laddr string) (Listener, error)
 ```
 
 ## Listener
 
 [net.Listener](https://godoc.org/net#Listener)
-``` Go
+
+```Go
 type Listener interface {
     // Accept waits for and returns the next connection to the listener.
     Accept() (Conn, error)
@@ -35,7 +37,8 @@ type Listener interface {
 ## Connection
 
 [net.Conn](https://godoc.org/net#Conn)
-``` Go
+
+```Go
 type Conn interface {
     // Read reads data from the connection.
     Read(b []byte) (n int, err error)
@@ -64,53 +67,61 @@ type Conn interface {
 ## Dial
 
 [net.Dial](https://godoc.org/net#Dial)
-``` Go
+
+```Go
 func Dial(network, address string) (Conn, error)
 ```
 
-***
+---
 
 # Write
 
 [io.WriteString](https://godoc.org/io#WriteString)
-``` Go
+
+```Go
 func WriteString(w Writer, s string) (n int, err error)
 ```
 
 [fmt.Fprintln](https://godoc.org/fmt#Fprintln)
-``` Go
+
+```Go
 func Fprintln(w io.Writer, a ...interface{}) (n int, err error)
 ```
 
-***
+---
 
 # Read
 
 - [ioutil.ReadAll](https://godoc.org/io/ioutil#ReadAll)
-``` Go
+
+```Go
 func ReadAll(r io.Reader) ([]byte, error)
 ```
 
 - [bufio.NewScanner](https://godoc.org/bufio#NewScanner)
-``` Go
+
+```Go
 func NewScanner(r io.Reader) *Scanner
 ```
 
 - [bufio.Scan](https://godoc.org/bufio#Scanner.Scan)
-``` Go
+
+```Go
 func (s *Scanner) Scan() bool
 ```
 
 - [bufio.Text](https://godoc.org/bufio#Scanner.Text)
-``` Go
+
+```Go
 func (s *Scanner) Text() string
 ```
 
-***
+---
 
 # Read & Write
 
 - [io.Copy](https://godoc.org/io#Copy)
-``` GO
+
+```GO
 func Copy(dst Writer, src Reader) (written int64, err error)
 ```
