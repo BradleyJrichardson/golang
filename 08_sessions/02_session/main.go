@@ -3,6 +3,8 @@ package main
 import (
 	"html/template"
 	"net/http"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 type user struct {
