@@ -17,7 +17,6 @@ func main() {
 	db, err = sql.Open("mysql", "awsuser:mypassword@tcp(mydbinstance.cakwl95bxza0.us-west-1.rds.amazonaws.com:3306)/test02?charset=utf8")
 	check(err)
 	defer db.Close()
-	d
 	err = db.Ping()
 	check(err)
 
