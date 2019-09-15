@@ -1,8 +1,13 @@
 package main
 
 import (
+	"crypto/sha1"
+	"fmt"
 	"html/template"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 
 	uuid "github.com/satori/go.uuid"
@@ -22,7 +27,38 @@ func main() {
 
 func index(w http.ResponseWriter, req *http.Request) {
 	c := getCookie(w, req)
-	c = appendValue(w, c)
+	// process form submission
+	if req.Method == http.MethodPost {
+		mf, fh, err := req.FormFile("nf")
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer mf.Close()
+		// create sha for file name
+		ext := strings.Split(fh.Filename, ".")[1]
+		h := sha1.New()
+		io.Copy(h, mf)
+		fmt.Println(h.Sum(nil))
+
+		// https://godoc.org/hash#Hash.Sum
+		fname := fmt.Sprintf("%x", h.Sum(nil)) + "." + ext
+		// create new file
+		wd, err := os.Getwd()
+		if err != nil {
+			fmt.Println(err)
+		}
+		path := filepath.Join(wd, "public", "pics", fname)
+		nf, err := os.Create(path)
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer nf.Close()
+		// copy
+		mf.Seek(0, 0)
+		io.Copy(nf, mf)
+		// add filename to this user's cookie
+		c = appendValue(w, c, fname)
+	}
 	xs := strings.Split(c.Value, "|")
 	tpl.ExecuteTemplate(w, "index.gohtml", xs)
 }
@@ -40,22 +76,12 @@ func getCookie(w http.ResponseWriter, req *http.Request) *http.Cookie {
 	return c
 }
 
-func appendValue(w http.ResponseWriter, c *http.Cookie) *http.Cookie {
-	p1 := "disneyland.jpg"
-	p2 := "atbeach.jpg"
-	p3 := "hollywood.jpg"
-
+// takes in a file name now also
+func appendValue(w http.ResponseWriter, c *http.Cookie, fname string) *http.Cookie {
 	s := c.Value
-	if !strings.Contains(s, p1) {
-		s += "|" + p1
+	if !strings.Contains(s, fname) {
+		s += "|" + fname
 	}
-	if !strings.Contains(s, p2) {
-		s += "|" + p2
-	}
-	if !strings.Contains(s, p3) {
-		s += "|" + p3
-	}
-
 	c.Value = s
 	http.SetCookie(w, c)
 	return c
