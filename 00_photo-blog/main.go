@@ -28,6 +28,7 @@ func main() {
 func index(w http.ResponseWriter, req *http.Request) {
 	c := getCookie(w, req)
 	// process form submission
+
 	if req.Method == http.MethodPost {
 		mf, fh, err := req.FormFile("nf")
 		if err != nil {
@@ -42,23 +43,30 @@ func index(w http.ResponseWriter, req *http.Request) {
 
 		// https://godoc.org/hash#Hash.Sum
 		fname := fmt.Sprintf("%x", h.Sum(nil)) + "." + ext
+
 		// create new file
-		wd, err := os.Getwd()
+		wd, err := os.Getwd() // getwd gets the location
 		if err != nil {
 			fmt.Println(err)
 		}
+		fmt.Println("wd", wd)
+
 		path := filepath.Join(wd, "public", "pics", fname)
-		nf, err := os.Create(path)
+		nf, err := os.Create(path) // func Create(name string) (*File, error)
 		if err != nil {
 			fmt.Println(err)
 		}
+		fmt.Println("path", path)
+
 		defer nf.Close()
 		// copy
 		mf.Seek(0, 0)
+
 		io.Copy(nf, mf)
 		// add filename to this user's cookie
 		c = appendValue(w, c, fname)
 	}
+
 	xs := strings.Split(c.Value, "|")
 	tpl.ExecuteTemplate(w, "index.gohtml", xs)
 }
