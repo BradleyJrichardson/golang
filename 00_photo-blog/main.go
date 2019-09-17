@@ -21,14 +21,14 @@ func init() {
 
 func main() {
 	http.HandleFunc("/", index)
+	// add route to serve pictures
+	http.Handle("/public/", http.StripPrefix("/public", http.FileServer(http.Dir("./public"))))
 	http.Handle("/favicon.ico", http.NotFoundHandler())
 	http.ListenAndServe(":8080", nil)
 }
 
 func index(w http.ResponseWriter, req *http.Request) {
 	c := getCookie(w, req)
-	// process form submission
-
 	if req.Method == http.MethodPost {
 		mf, fh, err := req.FormFile("nf")
 		if err != nil {
@@ -39,36 +39,28 @@ func index(w http.ResponseWriter, req *http.Request) {
 		ext := strings.Split(fh.Filename, ".")[1]
 		h := sha1.New()
 		io.Copy(h, mf)
-		fmt.Println(h.Sum(nil))
-
-		// https://godoc.org/hash#Hash.Sum
 		fname := fmt.Sprintf("%x", h.Sum(nil)) + "." + ext
-
 		// create new file
-		wd, err := os.Getwd() // getwd gets the location
+		wd, err := os.Getwd()
 		if err != nil {
 			fmt.Println(err)
 		}
-		fmt.Println("wd", wd)
-
 		path := filepath.Join(wd, "public", "pics", fname)
-		nf, err := os.Create(path) // func Create(name string) (*File, error)
+		nf, err := os.Create(path)
 		if err != nil {
 			fmt.Println(err)
 		}
-		fmt.Println("path", path)
-
 		defer nf.Close()
 		// copy
 		mf.Seek(0, 0)
-
 		io.Copy(nf, mf)
 		// add filename to this user's cookie
 		c = appendValue(w, c, fname)
 	}
-
 	xs := strings.Split(c.Value, "|")
-	tpl.ExecuteTemplate(w, "index.gohtml", xs)
+
+	// sliced cookie values to only send over images
+	tpl.ExecuteTemplate(w, "index.gohtml", xs[1:])
 }
 
 func getCookie(w http.ResponseWriter, req *http.Request) *http.Cookie {
@@ -84,7 +76,6 @@ func getCookie(w http.ResponseWriter, req *http.Request) *http.Cookie {
 	return c
 }
 
-// takes in a file name now also
 func appendValue(w http.ResponseWriter, c *http.Cookie, fname string) *http.Cookie {
 	s := c.Value
 	if !strings.Contains(s, fname) {
