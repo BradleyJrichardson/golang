@@ -3,18 +3,21 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/GoesToEleven/golang-web-dev/042_mongodb/04_controllers/models"
-	"github.com/julienschmidt/httprouter"
 	"net/http"
+
+	"github.com/bradleyjrichardson/golang/12_mongodb/06/models"
+	"github.com/julienschmidt/httprouter"
 )
 
+// UserController export
 type UserController struct{}
 
+// NewUserController export
 func NewUserController() *UserController {
 	return &UserController{}
 }
 
-// Methods have to be capitalized to be exported, eg, GetUser and not getUser
+// GetUser Methods have to be capitalized to be exported, eg, GetUser and not getUser
 func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	u := models.User{
 		Name:   "James Bond",
@@ -33,6 +36,7 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 	fmt.Fprintf(w, "%s\n", uj)
 }
 
+// CreateUser export
 func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	u := models.User{}
 
@@ -50,6 +54,7 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, _ ht
 	fmt.Fprintf(w, "%s\n", uj)
 }
 
+// DeleteUser export
 func (uc UserController) DeleteUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// TODO: only write code to delete user
 	w.WriteHeader(http.StatusOK) // 200

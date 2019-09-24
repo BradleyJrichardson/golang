@@ -3,18 +3,18 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/GoesToEleven/golang-web-dev/042_mongodb/03_post-delete/models"
-	"github.com/julienschmidt/httprouter"
 	"net/http"
+
+	"github.com/bradleyjrichardson/golang/12_mongodb/06/models"
+	"github.com/julienschmidt/httprouter"
 )
 
 func main() {
 	r := httprouter.New()
 	r.GET("/", index)
 	r.GET("/user/:id", getUser)
-	// added route
+
 	r.POST("/user", createUser)
-	// added route plus parameter
 	r.DELETE("/user/:id", deleteUser)
 	http.ListenAndServe("localhost:8080", r)
 }

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bradleyjrichardson/go/12_mongodb/02_json/models"
+	"github.com/bradleyjrichardson/golang/12_mongodb/06/models"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -13,7 +13,7 @@ func main() {
 	r := httprouter.New()
 	r.GET("/", index)
 	// added route plus parameter
-	r.GET("/user/:id", getUser)a
+	r.GET("/user/:id", getUser)
 	http.ListenAndServe("localhost:8080", r)
 }
 
