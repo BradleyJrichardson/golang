@@ -13,7 +13,7 @@ func main() {
 	r := httprouter.New()
 	r.GET("/", index)
 	// added route plus parameter
-	r.GET("/user/:id", getUser)
+	r.GET("/user/:id", getUser)a
 	http.ListenAndServe("localhost:8080", r)
 }
 
