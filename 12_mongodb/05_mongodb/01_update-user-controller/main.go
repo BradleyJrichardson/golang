@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/GoesToEleven/golang-web-dev/042_mongodb/05_mongodb/01_update-user-controller/controllers"
+	"net/http"
+
+	"github.com/bradleyjrichardson/golang/12_mongodb/06/controllers"
 	"github.com/julienschmidt/httprouter"
 	"gopkg.in/mgo.v2"
-	"net/http"
 )
 
 func main() {
@@ -25,5 +26,5 @@ func getSession() *mgo.Session {
 	if err != nil {
 		panic(err)
 	}
-	return s
+	return
 }
